@@ -3,29 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simulador 3D LED Pro – v2.5 (Natural + Walk)</title>
+  <title>Simulador 3D LED Pro – v5.2 (Fixes & Textures)</title>
   <style>
-    /* --- CSS VARIABLES (VISUAL UPGRADE) --- */
+    /* --- CSS VARIABLES (MANTENIDAS) --- */
     :root {
-      /* Palette dark mode mejorada para contraste y legibilidad "App Pro" */
-      --panel-bg: rgba(10, 12, 16, 0.85); /* Más oscuro y translúcido */
+      --panel-bg: rgba(10, 12, 16, 0.85);
       --panel-border: rgba(255, 255, 255, 0.08);
-      --text: #f1f5f9; /* Slate 100 - Texto principal más brillante */
-      --text-muted: #94a3b8; /* Slate 400 */
-      --accent: #3b82f6; /* Blue 500 */
-      --accent-hover: #2563eb; /* Blue 600 */
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
       --btn-bg: rgba(255, 255, 255, 0.05);
       --btn-hover: rgba(255, 255, 255, 0.12);
-      --input-bg: rgba(0, 0, 0, 0.4); /* Inputs más oscuros para contraste */
+      --input-bg: rgba(0, 0, 0, 0.4);
       --input-border: rgba(255, 255, 255, 0.1);
       --input-focus: rgba(59, 130, 246, 0.5);
-      --card-bg: rgba(255, 255, 255, 0.03); /* Sutil */
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.5); /* Sombra difusa de alta calidad */
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
       --modal-overlay: rgba(0, 0, 0, 0.85);
       --err-bg: #2a0a0a;
       --err-txt: #ff8888;
-      
-      /* Animaciones */
       --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -44,27 +41,9 @@
 
     html, body { height:100%; margin:0; overflow:hidden; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #000; letter-spacing: -0.01em; }
     
-    /* ENTORNO: CIELO, ESTRELLAS, NUBES */
-    #bgSky { position: fixed; inset: 0; z-index: 0; background: #000; transition: background 1.5s ease-in-out; } /* Transición más suave */
-    
-    #stars { position:absolute; inset:0; pointer-events:none; opacity:1; transition: opacity 1.5s ease; z-index: 1; }
-    .star { position:absolute; background:#fff; border-radius:50%; opacity:0.8; box-shadow: 0 0 4px rgba(255,255,255,0.8); } /* Glow en estrellas */
-
-    #clouds {
-      position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      opacity: 0.6; transition: opacity 2s ease;
-      background: 
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%),
-        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.12) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%);
-      filter: blur(50px); /* Blur aumentado para realismo */
-      animation: cloudMove 120s linear infinite alternate;
-    }
-    @keyframes cloudMove { from { transform: scale(1.0) translate(0,0); } to { transform: scale(1.15) translate(-30px, 15px); } }
-
     #gl { display:block; width:100vw; height:100vh; position:relative; z-index:5; cursor: default; outline: none; }
 
-    /* PANEL UI MEJORADO (Glassmorphism + Layout) */
+    /* PANEL UI */
     #panel {
       position:fixed; top:12px; left:12px; z-index:10;
       width:360px; max-height:calc(100vh - 24px); overflow-y:auto; overflow-x:hidden;
@@ -72,25 +51,21 @@
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       border-radius: 16px;
-      backdrop-filter: blur(20px) saturate(180%); /* Efecto vidrio premium */
+      backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       box-shadow: var(--shadow);
       color: var(--text);
       transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
       font-size: 13px;
     }
-    
-    /* Scrollbar estilizado */
     #panel::-webkit-scrollbar { width:6px; }
     #panel::-webkit-scrollbar-track { background:transparent; }
     #panel::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:3px; }
-    #panel::-webkit-scrollbar-thumb:hover { background:rgba(255,255,255,0.3); }
 
     h1, h2, h3 { margin:0; font-weight:600; letter-spacing: -0.02em; }
     #topBar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom: 8px; border-bottom: 1px solid var(--panel-border); }
     #projName { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; color: var(--text); }
     
-    /* Botones de Iconos refinados */
     .iconBtn {
       background:transparent; border:none; color:var(--text); cursor:pointer; padding:6px; border-radius:6px; opacity:0.6; 
       transition: all var(--transition-fast);
@@ -104,71 +79,40 @@
     .row { display:flex; align-items:center; gap:10px; margin:8px 0; min-height: 28px; }
     label { flex:0 0 90px; font-size:12px; font-weight: 500; color:var(--text-muted); opacity:1; user-select: none; }
     
-    /* INPUTS MEJORADOS (Objective 3) */
-    input[type="text"], 
-    input[type="number"],
-    select {
+    input[type="text"], input[type="number"], select {
       background: var(--input-bg);
       border: 1px solid var(--input-border);
       color: var(--text);
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-family: inherit;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      outline: none;
+      border-radius: 6px; padding: 4px 8px; font-size: 12px; font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; outline: none;
     }
-    
-    /* Estados de Focus para Inputs */
-    input[type="text"]:focus, 
-    input[type="number"]:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px var(--input-focus);
-      background: rgba(0,0,0,0.6);
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 2px var(--input-focus); background: rgba(0,0,0,0.6);
     }
 
     input[type="number"] { width:65px; text-align: right; font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
     input[type="text"] { width:100%; box-sizing:border-box;}
     select { flex:1; cursor: pointer; padding-right: 20px; }
 
-    /* SLIDER MEJORADO (Objective 3) */
-
+    /* SLIDER FIX */
     input[type="range"] {
-      flex:1; cursor:pointer; 
-      -webkit-appearance: none; /* Chrome/Safari */
-      appearance: none;         /* Estándar para evitar warning */
-      background: transparent; height: 20px;
+      flex:1; cursor:pointer; -webkit-appearance: none; appearance: none; background: transparent; height: 20px;
     }
     input[type="range"]::-webkit-slider-runnable-track {
-      width: 100%; height: 4px; border-radius: 2px;
-      background: rgba(255,255,255,0.2);
-      transition: background 0.2s;
+      width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); transition: background 0.2s;
     }
     input[type="range"]:hover::-webkit-slider-runnable-track { background: rgba(255,255,255,0.3); }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%;
-      background: var(--text); margin-top: -5px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-      transition: transform 0.1s, background 0.2s;
+      background: var(--text); margin-top: -5px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: transform 0.1s, background 0.2s;
     }
     input[type="range"]:focus::-webkit-slider-thumb { background: var(--accent); transform: scale(1.1); }
-    input[type="range"]::-moz-range-thumb {
-      height: 14px; width: 14px; border-radius: 50%; border: none;
-      background: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
+    input[type="range"]::-moz-range-track { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); }
+    input[type="range"]::-moz-range-thumb { height: 14px; width: 14px; border-radius: 50%; border: none; background: var(--text); }
 
-    input[type="color"] { 
-      width:100%; height:28px; border:1px solid var(--input-border); 
-      background:var(--input-bg); border-radius: 6px; cursor:pointer; padding:2px; box-sizing: border-box;
-    }
-    
-    input[type="checkbox"] { 
-      width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; margin: 0;
-      border-radius: 4px;
-    }
+    input[type="color"] { width:100%; height:28px; border:1px solid var(--input-border); background:var(--input-bg); border-radius: 6px; cursor:pointer; padding:2px; box-sizing: border-box; }
+    input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; margin: 0; border-radius: 4px; }
 
-    /* BOTONES DE ACCIÓN MEJORADOS */
     button.action {
       flex:1; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:600;
       border:1px solid var(--panel-border); background:var(--btn-bg); color:var(--text); 
@@ -176,7 +120,6 @@
       display: inline-flex; justify-content: center; align-items: center;
     }
     button.action:hover { background:var(--btn-hover); border-color:rgba(255,255,255,0.2); transform: translateY(-1px); }
-    button.action:active { transform: translateY(0); opacity: 0.8; }
     
     button.primary { background:var(--accent); color:#fff; border-color: transparent; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3); }
     button.primary:hover { background:var(--accent-hover); box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4); }
@@ -186,12 +129,7 @@
 
     .hr { height:1px; background:var(--panel-border); margin:16px 0; opacity: 0.5; }
     
-    .card { 
-      border-radius:8px; padding:12px; 
-      border:1px solid var(--panel-border); 
-      background:var(--card-bg); margin-bottom:10px; 
-      transition: border-color 0.2s;
-    }
+    .card { border-radius:8px; padding:12px; border:1px solid var(--panel-border); background:var(--card-bg); margin-bottom:10px; transition: border-color 0.2s; }
     .card:hover { border-color: rgba(255,255,255,0.2); }
     
     .cardHead { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
@@ -200,21 +138,11 @@
 
     .btnRow { display:flex; gap:8px; margin-top:10px; }
     
-    .modal {
-      display:none; position:fixed; inset:0; z-index:100;
-      background: var(--modal-overlay); backdrop-filter:blur(6px);
-      align-items:center; justify-content:center;
-    }
+    .modal { display:none; position:fixed; inset:0; z-index:100; background: var(--modal-overlay); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
     .modal.open { display:flex; animation: fadeIn 0.2s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .modalBox {
-      width:400px; max-width:90%; max-height:90vh; overflow-y:auto;
-      background: #111418; /* Solid bg for modal to avoid clutter */
-      border:1px solid var(--panel-border);
-      border-radius:16px; padding:24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-      color:var(--text); display:flex; flex-direction:column; gap:16px;
-    }
+    .modalBox { width:400px; max-width:90%; max-height:90vh; overflow-y:auto; background: #111418; border:1px solid var(--panel-border); border-radius:16px; padding:24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); color:var(--text); display:flex; flex-direction:column; gap:16px; }
     .modalHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:0; padding-bottom: 12px; border-bottom: 1px solid var(--panel-border); }
     .modalClose { cursor:pointer; font-size:24px; line-height:1; opacity:0.6; transition: 0.2s; }
     .modalClose:hover { opacity:1; color: var(--err-txt); }
@@ -227,34 +155,17 @@
     .projActions { display:flex; gap:4px; }
     .projMeta { font-size:11px; opacity:0.6; display:block; margin-top:3px; }
 
-    #fatal {
-      position:fixed; inset:0; display:none; place-items:center;
-      background:var(--err-bg); color:var(--err-txt); z-index:9999; padding:20px;
-    }
-    #fatal .box {
-      max-width:800px; border:1px solid var(--panel-border);
-      border-radius:16px; padding:20px; background: rgba(20,20,20,0.95);
-    }
+    #fatal { position:fixed; inset:0; display:none; place-items:center; background:var(--err-bg); color:var(--err-txt); z-index:9999; padding:20px; }
+    #fatal .box { max-width:800px; border:1px solid var(--panel-border); border-radius:16px; padding:20px; background: rgba(20,20,20,0.95); }
     #fatal h2 { margin:0 0 10px; font-size:18px; }
     #fatal pre { white-space:pre-wrap; font-size:12px; opacity:.9; margin:10px 0 0; background:#000; padding:10px; border-radius:6px; color:#ddd; }
 
-    #toast {
-      position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px);
-      padding:10px 20px; border-radius:30px; font-size:13px; font-weight:500;
-      background: rgba(20, 20, 20, 0.9); border:1px solid rgba(255,255,255,0.15); color:#fff;
-      backdrop-filter: blur(8px);
-      opacity:0; transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-      pointer-events:none; z-index:200; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-    }
+    #toast { position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); padding:10px 20px; border-radius:30px; font-size:13px; font-weight:500; background: rgba(20, 20, 20, 0.9); border:1px solid rgba(255,255,255,0.15); color:#fff; backdrop-filter: blur(8px); opacity:0; transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); pointer-events:none; z-index:200; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
     #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-  <div id="bgSky">
-    <div id="stars"></div>
-    <div id="clouds"></div>
-  </div>
   <canvas id="gl"></canvas>
 
   <div id="panel">
@@ -263,7 +174,7 @@
         <span style="font-size:10px; font-weight:700; color:var(--text-muted); letter-spacing:0.05em;">PROYECTO</span>
         <div style="display:flex; align-items:center; gap:8px; margin-top: 4px;">
            <span id="projName">Cargando...</span>
-           <button class="iconBtn" id="btnProjects" title="Gestionar Proyectos"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></button>
+           <button class="iconBtn" id="btnProjects" title="Gestionar Proyectos"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></button>
            <button class="iconBtn" id="btnSave" title="Guardar"><svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg></button>
         </div>
       </div>
@@ -290,6 +201,13 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
          <div style="font-size:11px;">Dim: <span id="roomDimsInline" style="font-family:monospace; color:var(--text)">12x10x30</span></div>
          <button class="action" id="btnEditRoomDims" style="flex:0 0 auto; padding:4px 8px; font-size:10px;">Editar Tamaño</button>
+      </div>
+      <div class="row"><label>Paredes</label>
+        <select id="roomWallType">
+          <option value="plaster">Revoque</option>
+          <option value="brick">Ladrillo</option>
+          <option value="paint">Pintura</option>
+        </select>
       </div>
        <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
         <label style="flex:0 0 auto;">Techo</label>
@@ -322,6 +240,13 @@
       <div class="cardHead">
         <div><div class="badge" id="name">Reflector</div><div class="tiny muted" id="posRead">x=0 y=0 z=0</div></div>
         <div class="badge" id="watRead" style="font-weight:400">0 W</div>
+      </div>
+      <div class="row"><label>Tipo Vis.</label>
+        <select id="lType">
+          <option value="0">LED (Bulbo)</option>
+          <option value="1">Reflector (Caja)</option>
+          <option value="2">Farola (Poste)</option>
+        </select>
       </div>
       <div class="row"><label>Color</label><input id="clr" type="color" value="#ffffff" style="width:100%"/></div>
       <div class="row"><label>Watts</label><input id="wat" type="range" min="1" max="100" step="1" value="30"/><input id="watNum" type="number" step="any" min="1" max="100" value="30"/></div>
@@ -368,603 +293,617 @@
   <div id="toast"></div>
   <div id="fatal"><div class="box"><h2>Error Crítico</h2><div id="fatalText"></div><pre id="fatalPre"></pre></div></div>
 
-<script>
-(() => {
-  // --- UTILS ---
-  const fatal=(m,e)=>{const l=document.getElementById("fatal");if(l){l.style.display="grid";document.getElementById("fatalText").textContent=m;document.getElementById("fatalPre").textContent=e?(e.stack||String(e)):"";}console.error(m,e);};
-  const toast=(m)=>{const t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);};
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  const lerpColor=(c1,c2,t)=>[lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)];
-  const formatTime=(t)=>{const h=Math.floor(t);const m=Math.floor((t-h)*60);return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;};
-  const uid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-  // --- STARS GENERATOR ---
-  const generateStars=()=>{const e=document.getElementById('stars');if(!e)return;e.innerHTML='';for(let i=0;i<400;i++){const s=document.createElement('div');s.className='star';s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*60)+'%';const z=Math.random()*2;s.style.width=z+'px';s.style.height=z+'px';s.style.opacity=Math.random()*0.8;e.appendChild(s);}};
+// --- UTILS ORIGINALES (NO TOCAR) ---
+const fatal=(m,e)=>{const l=document.getElementById("fatal");if(l){l.style.display="grid";document.getElementById("fatalText").textContent=m;document.getElementById("fatalPre").textContent=e?(e.stack||String(e)):"";}console.error(m,e);};
+const toast=(m)=>{const t=document.getElementById('toast');if(!t)return;t.innerText=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const lerpColor=(c1,c2,t)=>[lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)];
+const formatTime=(t)=>{const h=Math.floor(t);const m=Math.floor((t-h)*60);return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
 
-  const NEW_KEY = 'sim3d_v24_data';
-  const LEGACY_KEYS = ['sim3d_v23_data', 'sim3d_v2_data', 'sim3d_data'];
-
-  const migrateStorage = () => {
-    if(localStorage.getItem(NEW_KEY)) return;
-    for(const key of LEGACY_KEYS) {
-      const raw = localStorage.getItem(key);
-      if(raw) { try { localStorage.setItem(NEW_KEY, raw); return; } catch(e) {} }
+// --- PROCEDURAL TEXTURE SYSTEM (OBJETIVO 2) ---
+const textureCache = {};
+function getTexturePreset(type) {
+  if (textureCache[type]) return textureCache[type];
+  const size = 512;
+  const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  
+  if (type === 'brick') {
+    // Ladrillo rústico
+    ctx.fillStyle = '#8a5a44'; ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#6d4c41'; // Color mortero
+    const bh = 64; const bw = 128;
+    for(let y=0; y<size; y+=bh) {
+      const offset = (y/bh)%2===0 ? 0 : bw/2;
+      for(let x=-bw; x<size; x+=bw) {
+        ctx.fillRect(x+offset, y, bw-4, bh-4);
+        // Ruido interno
+        if(Math.random()>0.5) { ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fillRect(x+offset,y,bw-4,bh-4); ctx.fillStyle='#6d4c41'; }
+      }
     }
-  };
+  } else if (type === 'paint') {
+    // Pintura lisa (ruido muy suave)
+    ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0,0,size,size);
+    for(let i=0; i<5000; i++) {
+      ctx.fillStyle = `rgba(0,0,0,0.03)`;
+      ctx.beginPath(); ctx.arc(Math.random()*size, Math.random()*size, 1+Math.random()*2, 0, Math.PI*2); ctx.fill();
+    }
+  } else {
+    // Plaster (default) - Revoque fino
+    ctx.fillStyle = '#cccccc'; ctx.fillRect(0,0,size,size);
+    for(let i=0; i<30000; i++) {
+      const g = Math.floor(Math.random()*60 + 180);
+      ctx.fillStyle = `rgba(${g},${g},${g},0.08)`;
+      ctx.fillRect(Math.random()*size, Math.random()*size, 2, 2);
+    }
+  }
+  
+  // Fake AO (Oscurecer bordes para volumen)
+  const grad = ctx.createRadialGradient(size/2, size/2, size*0.4, size/2, size/2, size*0.7);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, 'rgba(0,0,0,0.4)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,size,size);
 
-  // --- APP ---
-  const APP = {
-    state: {
-      storageKey: NEW_KEY, current: null, projects: {}, activeRoomIndex: 0,
-      template: () => ({
-        id: uid(), name: "Nuevo Proyecto", updated: Date.now(),
-        rooms: [{ id: uid(), name: "Estructura Principal", w:12, h:10, l:30, x:0, z:0, roof:true }],
-        env: { time: 14.0 }, 
-        camera: { pos: [0, 5, 35], yaw: 0, pitch: -0.1 },
-        render: { exp: 1.6, amb: 0.1 },
-        lights: [{ name:"R1", x:-3, y:8, z:-5, watts:30, angle:60, dist:65, color:"#ffffff" },{ name:"R2", x:3, y:8, z:-5, watts:30, angle:60, dist:65, color:"#ffffff" }]
-      }),
-      initData() {
-        migrateStorage();
-        try {
-          const raw = localStorage.getItem(this.storageKey);
-          if (raw) { const data = JSON.parse(raw); this.projects = data.projects || {}; if(data.activeId && this.projects[data.activeId]) this.current = this.projects[data.activeId]; }
-          if (!this.current) { const p = this.template(); p.name = "Proyecto Inicial"; this.projects[p.id] = p; this.current = p; }
-          this.ensureStructure();
-        } catch(e) { this.projects = {}; this.current = this.template(); }
-      },
-      ensureStructure() {
-        if(!this.current) return;
-        if(!this.current.rooms && this.current.room) {
-          const old = this.current.room; const oldRoof = (this.current.env && this.current.env.roof !== undefined) ? this.current.env.roof : true;
-          this.current.rooms = [{ id: uid(), name: "Estructura Base", w: old.w||12, h: old.h||10, l: old.l||30, x:0, z:0, roof: oldRoof }]; delete this.current.room;
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  // Anisotropy para nitidez a distancia
+  tex.anisotropy = 4; // Valor seguro
+  textureCache[type] = tex;
+  return tex;
+}
+
+// STORAGE MIGRATION
+const NEW_KEY = 'sim3d_v40_three_data';
+const LEGACY_KEYS = ['sim3d_v24_data', 'sim3d_v23_data', 'sim3d_v2_data', 'sim3d_data'];
+const migrateStorage = () => {
+  if(localStorage.getItem(NEW_KEY)) return;
+  for(const key of LEGACY_KEYS) {
+    const raw = localStorage.getItem(key);
+    if(raw) { try { localStorage.setItem(NEW_KEY, raw); return; } catch(e) {} }
+  }
+};
+
+// --- APP ---
+const APP = {
+  state: {
+    storageKey: NEW_KEY, current: null, projects: {}, activeRoomIndex: 0,
+    template: () => ({
+      id: uid(), name: "Nuevo Proyecto", updated: Date.now(),
+      rooms: [{ id: uid(), name: "Estructura Principal", w:12, h:10, l:30, x:0, z:0, roof:true, wallType:'plaster' }],
+      env: { time: 14.0 }, 
+      camera: { pos: [0, 5, 35], yaw: 0, pitch: -0.1 },
+      render: { exp: 1.0, amb: 0.1 }, 
+      lights: [{ name:"R1", x:-3, y:8, z:-5, watts:30, angle:60, dist:65, color:"#ffffff", type:1 },{ name:"R2", x:3, y:8, z:-5, watts:30, angle:60, dist:65, color:"#ffffff", type:1 }]
+    }),
+    initData() {
+      migrateStorage();
+      try {
+        const raw = localStorage.getItem(this.storageKey);
+        if (raw) { const data = JSON.parse(raw); this.projects = data.projects || {}; if(data.activeId && this.projects[data.activeId]) this.current = this.projects[data.activeId]; }
+        if (!this.current) { const p = this.template(); p.name = "Proyecto Inicial"; this.projects[p.id] = p; this.current = p; }
+        this.ensureStructure();
+      } catch(e) { this.projects = {}; this.current = this.template(); }
+    },
+    ensureStructure() {
+      if(!this.current) return;
+      if(!this.current.rooms && this.current.room) {
+        const old = this.current.room; const oldRoof = (this.current.env && this.current.env.roof !== undefined) ? this.current.env.roof : true;
+        this.current.rooms = [{ id: uid(), name: "Estructura Base", w: old.w||12, h: old.h||10, l: old.l||30, x:0, z:0, roof: oldRoof, wallType:'plaster' }]; delete this.current.room;
+      }
+      if(!this.current.env) this.current.env = { time: 12 };
+      if(this.activeRoomIndex >= this.current.rooms.length) this.activeRoomIndex = 0;
+      this.current.lights.forEach(l => { if(l.type === undefined) l.type = 0; });
+      // Asegurar wallType en proyectos viejos
+      this.current.rooms.forEach(r => { if(!r.wallType) r.wallType = 'plaster'; });
+    },
+    save() {
+      if (!this.current) return;
+      this.current.updated = Date.now(); 
+      this.current.camera = { pos: [APP.gl.camera.position.x, APP.gl.camera.position.y, APP.gl.camera.position.z], yaw: APP.gl.camData.yaw, pitch: APP.gl.camData.pitch };
+      this.current.render = { exp: parseFloat(APP.ui.el.exp.value)||1.0, amb: parseFloat(APP.ui.el.amb.value)||0.1 };
+      this.current.env.time = parseFloat(APP.ui.el.timeSlider.value);
+      this.projects[this.current.id] = this.current;
+      localStorage.setItem(this.storageKey, JSON.stringify({ activeId: this.current.id, projects: this.projects }));
+      if(APP.ui.ready) { toast("Guardado"); APP.ui.renderProjectList(); }
+    },
+    create() { const p = this.template(); this.projects[p.id] = p; this.load(p.id); },
+    load(id) {
+      if (!this.projects[id]) return;
+      this.current = JSON.parse(JSON.stringify(this.projects[id])); 
+      this.activeRoomIndex = 0; this.ensureStructure(); this.save();
+      APP.gl.loadRoom(this.current.rooms);
+      APP.gl.loadLights(this.current.lights);
+      if(this.current.camera) {
+        APP.gl.camera.position.set(...this.current.camera.pos);
+        APP.gl.camData.yaw = this.current.camera.yaw || 0;
+        APP.gl.camData.pitch = this.current.camera.pitch || 0;
+      }
+      if(APP.gl.camera.position.y < 1.7) APP.gl.camera.position.y = 1.7;
+      APP.ui.syncAll();
+    },
+    delete(id) { if (Object.keys(this.projects).length <= 1) return toast("No borrar único"); delete this.projects[id]; if (this.current.id === id) this.load(Object.keys(this.projects)[0]); else this.save(); },
+    rename(id, n) { if(this.projects[id] && n.trim()){ this.projects[id].name=n; if(this.current.id===id) this.current.name=n; this.save(); APP.ui.syncAll(); } },
+    addRoom() { this.current.rooms.push({ id:uid(), name:`Estructura ${this.current.rooms.length+1}`, w:12, h:10, l:12, x:15, z:0, roof:true, wallType:'plaster' }); this.activeRoomIndex = this.current.rooms.length - 1; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); },
+    cloneRoom() { const src = this.current.rooms[this.activeRoomIndex]; this.current.rooms.push({ ...src, id:uid(), name:src.name+" (C)", x:src.x+5, z:src.z+5 }); this.activeRoomIndex = this.current.rooms.length - 1; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); },
+    delRoom() { if(this.current.rooms.length <= 1) return toast("Mínimo 1 estructura"); this.current.rooms.splice(this.activeRoomIndex, 1); this.activeRoomIndex = 0; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); }
+  },
+
+  gl: {
+    scene: null, camera: null, renderer: null,
+    lights: [], selected: -1,
+    raycaster: new THREE.Raycaster(), mouse: new THREE.Vector2(),
+    keys: {}, 
+    camData: { yaw: 0, pitch: -0.1 },
+    walk: false, velY: 0,
+    materials: {}, geometries: {},
+    env: { grid: null, sky: null, ambient: null, ground: null },
+    meshes: { rooms: [], lights: [] },
+
+    init() {
+      const canvas = document.getElementById("gl");
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0x000000);
+      this.scene.fog = new THREE.Fog(0x000000, 20, 100);
+
+      this.camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500);
+      this.camera.rotation.order = 'YXZ'; 
+
+      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      this.renderer.setSize(innerWidth, innerHeight);
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+      this.renderer.shadowMap.enabled = true; 
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+      this.renderer.toneMapping = THREE.ACESFilmicToneMapping; 
+      
+      this.resize(); window.addEventListener("resize", () => this.resize());
+
+      // Base Materials (Floor/Roof)
+      const bumpMap = getTexturePreset('plaster'); // Base noise for floor too
+      this.materials.floor = new THREE.MeshStandardMaterial({ 
+        color: 0x113311, roughness: 0.95, metalness: 0.0, bumpMap: bumpMap, bumpScale: 0.2
+      });
+      // Roof (Interior)
+      this.materials.roof = new THREE.MeshStandardMaterial({ 
+        color: 0xffffff, roughness: 0.2, metalness: 0.1, side: THREE.DoubleSide
+      });
+      this.materials.led = new THREE.MeshBasicMaterial({ color: 0xffffee });
+
+      this.env.grid = new THREE.GridHelper(200, 200, 0x555555, 0x222222);
+      this.scene.add(this.env.grid);
+
+      this.env.ambient = new THREE.AmbientLight(0xffffff, 0.1);
+      this.scene.add(this.env.ambient);
+      
+      const groundGeo = new THREE.PlaneGeometry(500, 500);
+      groundGeo.rotateX(-Math.PI/2);
+      this.env.ground = new THREE.Mesh(groundGeo, this.materials.floor);
+      this.env.ground.receiveShadow = true;
+      this.env.ground.position.y = -0.05; 
+      this.scene.add(this.env.ground);
+
+      window.addEventListener("keydown", e => this.keys[e.key.toLowerCase()] = true);
+      window.addEventListener("keyup", e => this.keys[e.key.toLowerCase()] = false);
+      
+      let drag=false, lx=0, ly=0;
+      canvas.addEventListener("mousedown", e => { 
+        if(this.walk && !e.shiftKey) { canvas.requestPointerLock(); }
+        if(this.walk && document.pointerLockElement === canvas) return;
+        if(e.button===2) { drag=true; lx=e.clientX; ly=e.clientY; } 
+        if(e.button===0 && e.shiftKey) this.doRaycast(e.clientX, e.clientY);
+      });
+      window.addEventListener("mouseup", () => drag=false);
+      window.addEventListener("mousemove", e => { 
+        if(this.walk && document.pointerLockElement === canvas) {
+          this.camData.yaw -= e.movementX * 0.003;
+          this.camData.pitch = Math.max(-1.5, Math.min(1.5, this.camData.pitch - e.movementY * 0.003));
+          return;
         }
-        if(!this.current.env) this.current.env = { time: 12 };
-        if(this.activeRoomIndex >= this.current.rooms.length) this.activeRoomIndex = 0;
-      },
-      save() {
-        if (!this.current) return;
-        this.current.updated = Date.now(); this.current.camera = { ...APP.gl.cam };
-        this.current.render = { exp: parseFloat(APP.ui.el.exp.value)||1.6, amb: parseFloat(APP.ui.el.amb.value)||0.1 };
-        this.current.env.time = parseFloat(APP.ui.el.timeSlider.value);
-        this.projects[this.current.id] = this.current;
-        localStorage.setItem(this.storageKey, JSON.stringify({ activeId: this.current.id, projects: this.projects }));
-        if(APP.ui.ready) { toast("Guardado"); APP.ui.renderProjectList(); }
-      },
-      create() { const p = this.template(); this.projects[p.id] = p; this.load(p.id); },
-      load(id) {
-        if (!this.projects[id]) return;
-        this.current = JSON.parse(JSON.stringify(this.projects[id])); 
-        this.activeRoomIndex = 0; this.ensureStructure(); this.save();
-        APP.gl.loadRoom(this.current.rooms); APP.gl.loadLights(this.current.lights); APP.gl.cam = { ...this.current.camera }; APP.ui.syncAll();
-      },
-      delete(id) { if (Object.keys(this.projects).length <= 1) return toast("No borrar único"); delete this.projects[id]; if (this.current.id === id) this.load(Object.keys(this.projects)[0]); else this.save(); },
-      rename(id, n) { if(this.projects[id] && n.trim()){ this.projects[id].name=n; if(this.current.id===id) this.current.name=n; this.save(); APP.ui.syncAll(); } },
-      addRoom() { this.current.rooms.push({ id:uid(), name:`Estructura ${this.current.rooms.length+1}`, w:12, h:10, l:12, x:15, z:0, roof:true }); this.activeRoomIndex = this.current.rooms.length - 1; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); },
-      cloneRoom() { const src = this.current.rooms[this.activeRoomIndex]; this.current.rooms.push({ ...src, id:uid(), name:src.name+" (C)", x:src.x+5, z:src.z+5 }); this.activeRoomIndex = this.current.rooms.length - 1; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); },
-      delRoom() { if(this.current.rooms.length <= 1) return toast("Mínimo 1 estructura"); this.current.rooms.splice(this.activeRoomIndex, 1); this.activeRoomIndex = 0; APP.gl.loadRoom(this.current.rooms); this.save(); APP.ui.syncRoomUI(); }
+        if(!drag)return; const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY; 
+        this.camData.yaw-=dx*0.004; this.camData.pitch=Math.max(-1.5, Math.min(1.5, this.camData.pitch-dy*0.004)); 
+      });
+      canvas.addEventListener("wheel", e => { 
+        if(this.walk) return; e.preventDefault(); 
+        const dir = new THREE.Vector3(); this.camera.getWorldDirection(dir);
+        this.camera.position.addScaledVector(dir, e.deltaY>0?-1:1);
+      }, {passive:false});
+      canvas.addEventListener("contextmenu", e=>e.preventDefault());
+
+      this.loop();
     },
 
-    gl: {
-      ctx: null, prog: {}, buffers: {}, lights: [], selected: -1,
-      cam: { pos: [0, 5, 35], yaw: 0, pitch: -0.1, fov: 60 },
-      keys: {}, env: { base:[1,1,1], fog:[0,0,0], grid:[0.5,0.5,0.5,0.5] },
-      roomCounts: { tri:0, grid:0 }, locs: {},
-      // WALK MODE STATE
-      walk: false, velY: 0,
+    resize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      this.renderer.setSize(w, h);
+      this.camera.aspect = w/h;
+      this.camera.updateProjectionMatrix();
+    },
 
-      init() {
-        const canvas = document.getElementById("gl");
-        this.ctx = canvas.getContext("webgl", { antialias: true, alpha: true });
-        if (!this.ctx) throw new Error("WebGL error");
-        this.resize(); window.addEventListener("resize", () => this.resize());
+    loadRoom(rooms) {
+      this.meshes.rooms.forEach(m => this.scene.remove(m));
+      this.meshes.rooms = [];
+
+      rooms.forEach(r => {
+        const roomGroup = new THREE.Group();
+        roomGroup.position.set(r.x, 0, r.z);
+
+        // Get Material Texture based on type
+        const wType = r.wallType || 'plaster';
+        const tex = getTexturePreset(wType);
         
-        const createProg = (vs, fs) => {
-          const gl = this.ctx;
-          const s = (t, src) => { const x = gl.createShader(t); gl.shaderSource(x, src); gl.compileShader(x); return x; };
-          const p = gl.createProgram(); gl.attachShader(p, s(gl.VERTEX_SHADER, vs)); gl.attachShader(p, s(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
-          return p;
+        // Helper to create wall with correct UV repeats (1 unit = 1 meter)
+        const createWall = (w, h, depth) => {
+          const geo = new THREE.BoxGeometry(w, h, depth);
+          // Set UV scaling based on dimensions to prevent stretching
+          // Only box mapping simple approach:
+          const mat = new THREE.MeshStandardMaterial({
+             map: tex, 
+             bumpMap: tex, 
+             bumpScale: (wType==='brick'?0.1:0.02),
+             color: (wType==='brick'?0xffffff:0xdddddd),
+             roughness: (wType==='paint'?0.4:0.9),
+             side: THREE.DoubleSide
+          });
+          // Clone texture for independent repeat per wall if needed, 
+          // or just map UVs in geometry. For BoxGeometry, we can clone map.
+          // Optimization: Reuse map, but we need independent repeat.
+          // Better: Use cloned material with cloned texture for specific repeat.
+          const localTex = tex.clone();
+          localTex.repeat.set(Math.max(1, w/2), Math.max(1, h/2)); // Aprox 2m pattern
+          localTex.needsUpdate = true;
+          mat.map = localTex; mat.bumpMap = localTex;
+
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.castShadow = true; mesh.receiveShadow = true;
+          return mesh;
         };
 
-        // --- SHADERS WITH PROCEDURAL TEXTURES (GRAPHIC IMPROVEMENTS) ---
-        // VShader: Minimal changes
-        const stdVS = `attribute vec3 aPos; attribute vec3 aNor; uniform mat4 uView, uProj; varying vec3 vPos, vNor; varying float vDist; void main(){ vPos=aPos; vNor=aNor; vec4 p=uView*vec4(aPos,1.0); vDist=length(p.xyz); gl_Position=uProj*p; }`;
-   // FShader: ACES Tone Mapping, Blinn-Phong Specular, Improved Fog, Dithering
-        const stdFS = `precision mediump float; varying vec3 vPos, vNor; varying float vDist;
-           uniform float uAmb, uExp, uGam;
-           uniform float uDay; // <--- NUEVO UNIFORM (0=Noche, 1=Día)
-           const int MAX=32; uniform int uCnt; uniform vec3 uLP[MAX], uLC[MAX]; uniform float uLW[MAX], uLCut[MAX], uLDist[MAX];
-           uniform vec3 uFogColor; uniform float uFogDen;
-           
-           // Noise Functions
-           float hash(vec2 p) { p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
-           float noise(vec2 p) { vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y); }
-           float fbm(vec2 p) { float v=0.0, a=0.5; for(int i=0;i<3;i++){ v+=a*noise(p); p*=2.0; a*=0.5; } return v; }
-
-           // ACES Tone Mapping (Realism Upgrade)
-           vec3 aces(vec3 x) {
-              const float a = 2.51; const float b = 0.03; const float c = 2.43; const float d = 0.59; const float e = 0.14;
-              return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
-           }
-
-           void main(){
-             vec3 N = normalize(vNor);
-             vec3 V = normalize(-vPos); // View vector (simplified, assuming view is origin relative)
-             bool isFloor = (N.y > 0.90);
-             bool isRoof  = (N.y < -0.90);
-
-             // Procedural Material
-             vec3 albedo;
-             float rough = 0.9; // Roughness factor for specular
-
-             if(isFloor) { 
-               // Floor (Grass) - DINÁMICO DÍA/NOCHE
-               float n = fbm(vPos.xz * 1.5);
-               float detail = noise(vPos.xz * 10.0);
-               
-               // Colores Noche (Más oscuros y desaturados)
-               vec3 dirtN = vec3(0.02, 0.02, 0.02);
-               vec3 grassDN = vec3(0.005, 0.015, 0.01);
-               vec3 grassLN = vec3(0.01, 0.05, 0.02);
-
-               // Colores Día (Originales)
-               vec3 dirtD = vec3(0.12, 0.10, 0.06);
-               vec3 grassDD = vec3(0.02, 0.12, 0.02);
-               vec3 grassLD = vec3(0.08, 0.28, 0.04);
-
-               // Mezcla basada en uDay
-               vec3 dirt = mix(dirtN, dirtD, uDay);
-               vec3 grassD = mix(grassDN, grassDD, uDay);
-               vec3 grassL = mix(grassLN, grassLD, uDay);
-
-               albedo = mix(dirt, grassD, n);
-               albedo = mix(albedo, grassL, detail * 0.7 + 0.2 * n);
-               rough = 1.0; // Very rough
-             } else {
-               // Walls/Roof (Plaster/Paint)
-               vec2 uv;
-               if(abs(N.x) > abs(N.z)) uv = vPos.zy; else uv = vPos.xy;
-
-               float n0 = fbm(uv * 0.35);      
-               float n1 = fbm(uv * 1.20);      
-               float speck = noise(uv * 18.0); 
-               float grain = noise(uv * 60.0); 
-
-               vec3 baseCool = vec3(0.83, 0.84, 0.86);
-               vec3 baseWarm = vec3(0.88, 0.87, 0.84);
-
-               albedo = mix(baseCool, baseWarm, n0);
-               albedo += (n1 - 0.5) * 0.035;
-               albedo += (speck - 0.5) * 0.020;
-               albedo += (grain - 0.5) * 0.010;
-
-               if(!isRoof) {
-                 float grime = 1.0 - smoothstep(0.0, 1.2, vPos.y); 
-                 float streak = fbm(vec2(uv.x * 0.8, vPos.y * 0.15));
-                 albedo *= (1.0 - grime * 0.06);
-                 albedo -= streak * grime * 0.02;
-               } else {
-                 albedo = albedo + vec3(0.04);
-                 albedo = mix(albedo, vec3(0.92,0.92,0.91), 0.55);
-               }
-               albedo = clamp(albedo, vec3(0.70), vec3(0.98));
-             }
-
-             // Ambient
-             vec3 col = albedo * uAmb; 
-
-             // Lights PBR-Lite (Blinn-Phong)
-             for(int i=0; i<MAX; i++){
-               if(i>=uCnt) break;
-               vec3 L_vec = uLP[i]-vPos; 
-               float d = length(L_vec); 
-               if(d > uLDist[i]) continue;
-               
-               vec3 L = L_vec / max(d, 0.001);
-               float spot = L.y; 
-               if(spot < uLCut[i]) continue;
-
-               float edge = smoothstep(uLCut[i], 1.0, spot);
-               // Inverse square law slightly modified for art direction
-               float att = 1.0 / (1.0 + 0.15*d + 0.025*d*d);
-               
-               float diff = max(dot(N, L), 0.0);
-               
-               // Specular (adds depth to materials)
-               vec3 H = normalize(L + V);
-               float spec = pow(max(dot(N, H), 0.0), 16.0) * (1.0 - rough) * 0.5;
-
-               vec3 lightColor = uLC[i] * uLW[i] * edge * att;
-               col += (albedo * diff + vec3(spec)) * lightColor;
-             }
-             
-             // Tone Mapping & Gamma
-             col = col * uExp; 
-             col = aces(col);
-             col = pow(col, vec3(1.0/max(uGam,0.1)));
-
-             // Improved Fog (Exponential Squared for smoother transitions)
-             float fog = 1.0 - exp(-vDist * vDist * uFogDen * uFogDen);
-             col = mix(col, uFogColor, fog);
-
-             // Dithering (Remove banding in darks)
-             col += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
-
-             gl_FragColor=vec4(col, 1.0);
-           }`;
-        this.prog.room = createProg(stdVS, stdFS);
-        this.prog.line = createProg(`attribute vec3 aPos; uniform mat4 uView, uProj; varying float vDist; void main(){ vec4 p=uView*vec4(aPos,1.0); vDist=length(p.xyz); gl_Position=uProj*p; }`,`precision mediump float; uniform vec4 uCol; uniform vec3 uFogColor; uniform float uFogDen; varying float vDist; void main(){ float fog=1.0-exp(-vDist*uFogDen); gl_FragColor=vec4(mix(uCol.rgb, uFogColor, fog), uCol.a); }`);
-        this.prog.point = createProg(`attribute vec3 aPos; attribute float aSel; uniform mat4 uView, uProj; varying float vSel; void main(){ vSel=aSel; gl_Position=uProj*uView*vec4(aPos,1.0); gl_PointSize=12.0+6.0*aSel; }`,`precision mediump float; varying float vSel; void main(){ vec2 p=gl_PointCoord*2.0-1.0; if(dot(p,p)>1.0) discard; gl_FragColor=vec4(mix(vec3(0.9), vec3(1.0,0.6,0.1), vSel), 1.0); }`);
-
-        const gl = this.ctx;
-        // Capture locations securely
-        this.locs = {
-          room: { pos: gl.getAttribLocation(this.prog.room, "aPos"), nor: gl.getAttribLocation(this.prog.room, "aNor") },
-          line: { pos: gl.getAttribLocation(this.prog.line, "aPos") },
-          point: { pos: gl.getAttribLocation(this.prog.point, "aPos"), sel: gl.getAttribLocation(this.prog.point, "aSel") }
-        };
-
-        this.buffers.roomPos = gl.createBuffer(); this.buffers.roomNor = gl.createBuffer(); this.buffers.grid = gl.createBuffer();
-        this.buffers.ptPos = gl.createBuffer(); this.buffers.ptSel = gl.createBuffer();
+        const T = 0.2; 
+        const hw = r.w/2; const hl = r.l/2; const hh = r.h/2;
         
-        window.addEventListener("keydown", e => this.keys[e.key.toLowerCase()] = true);
-        window.addEventListener("keyup", e => this.keys[e.key.toLowerCase()] = false);
-        let drag=false, lx=0, ly=0;
-        canvas.addEventListener("mousedown", e => { 
-            // WALK MODE: CLICK TO LOCK
-            if(this.walk && !e.shiftKey) { canvas.requestPointerLock(); }
-            // PREVENT RAYCAST IF LOCKED
-            if(this.walk && document.pointerLockElement === canvas) return;
+        const w1 = createWall(r.w, r.h, T); w1.position.set(0, hh, -hl + T/2);
+        const w2 = createWall(r.w, r.h, T); w2.position.set(0, hh, hl - T/2);
+        const w3 = createWall(T, r.h, r.l - 2*T); w3.position.set(-hw + T/2, hh, 0);
+        const w4 = createWall(T, r.h, r.l - 2*T); w4.position.set(hw - T/2, hh, 0);
 
-            if(e.button===2) { drag=true; lx=e.clientX; ly=e.clientY; } 
-        });
-        window.addEventListener("mouseup", () => drag=false);
-        window.addEventListener("mousemove", e => { 
-            // WALK MODE: MOUSE LOOK (FPS)
-            if(this.walk && document.pointerLockElement === canvas) {
-                this.cam.yaw -= e.movementX * 0.003;
-                this.cam.pitch = Math.max(-1.5, Math.min(1.5, this.cam.pitch - e.movementY * 0.003));
-                return;
-            }
-            if(!drag)return; const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY; this.cam.yaw-=dx*0.004; this.cam.pitch=Math.max(-1.5, Math.min(1.5, this.cam.pitch-dy*0.004)); 
-        });
-        canvas.addEventListener("wheel", e => { if(this.walk) return; e.preventDefault(); const fwd=this.getBasis().fwd; this.cam.pos=this.v3.add(this.cam.pos, this.v3.mul(fwd, e.deltaY>0?-1:1)); }, {passive:false});
-        canvas.addEventListener("mousedown", e => { if(!e.shiftKey || e.button!==0 || this.selected<0) return; this.raycast(e.clientX, e.clientY); });
-        canvas.addEventListener("contextmenu", e=>e.preventDefault());
-        
-        gl.enable(gl.DEPTH_TEST);
-        this.loop();
-      },
+        roomGroup.add(w1); roomGroup.add(w2); roomGroup.add(w3); roomGroup.add(w4);
 
-      resize() {
-        const c = this.ctx.canvas; const dpr = Math.min(window.devicePixelRatio||1, 2);
-        c.width = Math.floor(innerWidth*dpr); c.height = Math.floor(innerHeight*dpr);
-        c.style.width = innerWidth+"px"; c.style.height = innerHeight+"px";
-        this.ctx.viewport(0,0,c.width,c.height);
-      },
-
-      loadRoom(rooms) {
-        if(!Array.isArray(rooms)) return;
-        const pos=[], nor=[], grid=[];
-
-        // --- GROUND EXTERIOR ---
-        const G = 150; const yG = -0.02; 
-        pos.push(-G,yG,-G,  G,yG,-G,  G,yG, G,  -G,yG,-G,  G,yG, G,  -G,yG, G);
-        for(let i=0;i<6;i++) nor.push(0,1,0); 
-
-        rooms.forEach(r => {
-           const hw=r.w/2, hl=r.l/2, hh=r.h, ox=r.x, oz=r.z;
-           const plane = (a,b,c,d, n) => {
-             const push = (v) => pos.push(v[0]+ox, v[1], v[2]+oz);
-             push(a); push(b); push(c); push(a); push(c); push(d);
-             for(let i=0;i<6;i++) nor.push(...n);
-           };
-           plane([-hw,0,-hl], [ hw,0,-hl], [ hw,0, hl], [-hw,0, hl], [0,1,0]); // Floor
-           if(r.roof) plane([-hw,hh, hl], [ hw,hh, hl], [ hw,hh,-hl], [-hw,hh,-hl], [0,-1,0]); // Roof
-           // Walls
-           plane([-hw,0,-hl], [-hw,hh,-hl], [ hw,hh,-hl], [ hw,0,-hl], [0,0,1]);
-           plane([ hw,0, hl], [ hw,hh, hl], [-hw,hh, hl], [-hw,0, hl], [0,0,-1]);
-           plane([-hw,0, hl], [-hw,hh, hl], [-hw,hh,-hl], [-hw,0,-hl], [1,0,0]);
-           plane([ hw,0,-hl], [ hw,hh,-hl], [ hw,hh, hl], [ hw,0, hl], [-1,0,0]);
-        });
-
-        this.roomCounts.tri = pos.length/3;
-        const gl = this.ctx;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.roomPos); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.roomNor); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(nor), gl.STATIC_DRAW);
-        
-        // Grid (Only for visual ref, no texture)
-        const g=[]; const sz=50; 
-        for(let i=-sz;i<=sz;i+=1){ 
-            g.push(i,0.05,-sz,i,0.05,sz, -sz,0.05,i,sz,0.05,i);
+        if(r.roof) {
+          const roof = new THREE.Mesh(new THREE.BoxGeometry(r.w, T, r.l), this.materials.roof);
+          roof.position.y = r.h;
+          roof.castShadow = true; roof.receiveShadow = true; 
+          roomGroup.add(roof);
         }
-        this.roomCounts.grid = g.length/3;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.grid); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(g), gl.STATIC_DRAW);
-      },
 
-      loadLights(arr) { this.lights = arr; this.selected = arr.length > 0 ? 0 : -1; this.lights.forEach(l => this.clampLight(l)); if(APP.ui.ready) APP.ui.refreshLightSelect(); },
-      clampLight(l) { l.y = Math.max(0.2, l.y); l.x = Math.max(-100, Math.min(100, l.x)); l.z = Math.max(-100, Math.min(100, l.z)); },
-      v3: { add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], mul:(a,s)=>[a[0]*s,a[1]*s,a[2]*s], cross:(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]], norm:(a)=>{const l=Math.hypot(...a)||1; return [a[0]/l,a[1]/l,a[2]/l];} },
-      getBasis() { const c=Math.cos(this.cam.yaw), s=Math.sin(this.cam.yaw); return { fwd:[c*Math.cos(this.cam.pitch), Math.sin(this.cam.pitch), s*Math.cos(this.cam.pitch)], rgt:[s,0,-c], up:[0,1,0] }; },
-      raycast(mx, my) {
-        const rect = this.ctx.canvas.getBoundingClientRect();
-        const x = (mx-rect.left)/rect.width*2-1; const y = -((my-rect.top)/rect.height*2-1);
-        const b = this.getBasis();
-        const tan = Math.tan((this.cam.fov*Math.PI/180)/2);
-        const aspect = this.ctx.canvas.width / this.ctx.canvas.height;
-        const rgt = this.v3.norm(this.v3.cross(b.fwd, [0,1,0]));
-        const up = this.v3.cross(rgt, b.fwd);
-        const dir = this.v3.add(b.fwd, this.v3.add(this.v3.mul(rgt, x*aspect*tan), this.v3.mul(up, y*tan)));
+        this.scene.add(roomGroup);
+        this.meshes.rooms.push(roomGroup);
+      });
+    },
+
+    loadLights(lightsData) {
+      this.meshes.lights.forEach(l => { 
+        this.scene.remove(l.mesh); 
+        this.scene.remove(l.light); 
+        this.scene.remove(l.target);
+        this.scene.remove(l.helper); // FIX: Remover helper amarillo
+      });
+      this.meshes.lights = [];
+      this.lights = lightsData; 
+
+      lightsData.forEach((lData, i) => {
+        const color = new THREE.Color(lData.color);
+        const intensity = lData.watts * 50; 
+        const distance = lData.dist;
+        const angleRad = (lData.angle * Math.PI / 180) / 2; 
+
+        let lightObj = new THREE.SpotLight(color, intensity);
+        lightObj.distance = distance;
+        lightObj.angle = angleRad;
+        lightObj.penumbra = 0.3; 
+        lightObj.decay = 2.0; 
+        lightObj.castShadow = true;
+        lightObj.shadow.bias = -0.0001;
+        lightObj.shadow.mapSize.width = 1024; lightObj.shadow.mapSize.height = 1024;
         
-        const L = this.lights[this.selected];
-        if(!L) return;
-        const den = dir[1]; if(Math.abs(den)<1e-5) return;
-        const t = (L.y - this.cam.pos[1]) / den; if(t < 0) return;
-        const hit = this.v3.add(this.cam.pos, this.v3.mul(dir, t));
-        L.x = hit[0]; L.z = hit[2]; this.clampLight(L); APP.ui.loadLightToInputs(); toast("Movido");
-      },
-      loop() {
-        const gl = this.ctx; const b = this.getBasis(); const s = 0.2;
-        
-        if (this.walk) {
-// --- WALK MODE LOGIC (First Person) ---
-// Usa el mismo basis que el modo normal, pero "aplanado" al plano XZ.
-// Así WASD siempre respeta la dirección real de la cámara (yaw), sin forzar -Z.
-const fwdFlat = [b.fwd[0], 0, b.fwd[2]];
-const fLen = Math.hypot(fwdFlat[0], fwdFlat[2]) || 1;
-fwdFlat[0] /= fLen; 
-fwdFlat[2] /= fLen;
+        lightObj.position.set(lData.x, lData.y, lData.z);
+        lightObj.target.position.set(lData.x, 0, lData.z); 
+        this.scene.add(lightObj);
+        this.scene.add(lightObj.target);
 
-// Right vector consistente: right = normalize(cross(fwdFlat, up))
-const rgtFlat = this.v3.norm(this.v3.cross(fwdFlat, [0, 1, 0]));
+        let geo;
+        const type = lData.type || 0;
+        if(type === 0) geo = new THREE.SphereGeometry(0.3, 16, 16); 
+        else if(type === 1) geo = new THREE.BoxGeometry(0.5, 0.2, 0.5); 
+        else { geo = new THREE.CylinderGeometry(0.1, 0.1, 0.6); } 
 
-if (this.keys.w) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(fwdFlat,  s));
-if (this.keys.s) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(fwdFlat, -s));
-if (this.keys.d) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(rgtFlat,  s));
-if (this.keys.a) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(rgtFlat, -s));
+        const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ 
+          color: 0x222222, emissive: lData.color, emissiveIntensity: 2.0 
+        }));
+        mesh.position.copy(lightObj.position);
+        mesh.castShadow = true;
+        this.scene.add(mesh);
 
-// Jump & Gravity
-const eyeH = 1.7;
-if (this.keys[' '] && this.cam.pos[1] <= eyeH + 0.05) { 
-  this.velY = 0.35; 
-}
-this.velY -= 0.02;
-this.cam.pos[1] += this.velY;
-if (this.cam.pos[1] < eyeH) { 
-  this.cam.pos[1] = eyeH; 
-  this.velY = 0; 
-}
+        const helper = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe:true }));
+        helper.position.copy(lightObj.position);
+        helper.visible = false; // FIX: Iniciar oculto
+        this.scene.add(helper);
 
+        this.meshes.lights.push({ light: lightObj, target: lightObj.target, mesh: mesh, helper: helper, data: lData });
+      });
 
-        } else {
-            // --- FLY MODE LOGIC (Legacy) ---
-            if(this.keys.w) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(b.fwd, s));
-            if(this.keys.s) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(b.fwd, -s));
-            const rgt = this.v3.norm(this.v3.cross(b.fwd, [0,1,0]));
-            if(this.keys.d) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(rgt, s));
-            if(this.keys.a) this.cam.pos = this.v3.add(this.cam.pos, this.v3.mul(rgt, -s));
-            if(this.keys.e) this.cam.pos[1] += s;
-            if(this.keys.q) this.cam.pos[1] -= s;
+      this.selected = lightsData.length > 0 ? 0 : -1;
+      this.updateSelectionVisuals();
+      if(APP.ui.ready) APP.ui.refreshLightSelect();
+    },
+
+    clampLight(l) { l.y = Math.max(0.2, l.y); l.x = Math.max(-100, Math.min(100, l.x)); l.z = Math.max(-100, Math.min(100, l.z)); },
+
+    doRaycast(mx, my) {
+      this.mouse.x = (mx / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(my / window.innerHeight) * 2 + 1;
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      
+      const visualMeshes = this.meshes.lights.map(l => l.mesh);
+      const intersects = this.raycaster.intersectObjects(visualMeshes);
+
+      if(intersects.length > 0) {
+        const found = this.meshes.lights.find(l => l.mesh === intersects[0].object);
+        if(found) {
+          const idx = this.meshes.lights.indexOf(found);
+          this.selected = idx;
+          APP.ui.loadLightToInputs();
+          APP.ui.el.sel.value = idx;
+          this.updateSelectionVisuals();
+          toast("Luz Seleccionada");
         }
-        
-        gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        const aspect = gl.canvas.width/gl.canvas.height;
-        const f = 1/Math.tan(this.cam.fov*Math.PI/360);
-        const proj = [f/aspect,0,0,0, 0,f,0,0, 0,0,-1.002,-1, 0,0,-0.2002,0];
-        const cam = this.cam.pos;
-        const rgt = this.v3.norm(this.v3.cross(b.fwd, [0,1,0])); // Recalc for view matrix
-        const vm = [ rgt[0], this.v3.cross(rgt, b.fwd)[0], -b.fwd[0], 0, rgt[1], this.v3.cross(rgt, b.fwd)[1], -b.fwd[1], 0, rgt[2], this.v3.cross(rgt, b.fwd)[2], -b.fwd[2], 0, -(rgt[0]*cam[0] + rgt[1]*cam[1] + rgt[2]*cam[2]), -(this.v3.cross(rgt, b.fwd)[0]*cam[0] + this.v3.cross(rgt, b.fwd)[1]*cam[1] + this.v3.cross(rgt, b.fwd)[2]*cam[2]), -(-b.fwd[0]*cam[0] -b.fwd[1]*cam[1] -b.fwd[2]*cam[2]), 1 ];
-
-        const maxL=32; const p=[],c=[],w=[],cut=[],dist=[];
-        this.lights.forEach(l=>{ p.push(l.x,l.y,l.z); const h=parseInt(l.color.slice(1),16); c.push((h>>16&255)/255,(h>>8&255)/255,(h&255)/255); w.push(l.watts*0.06); cut.push(Math.cos(l.angle*Math.PI/360)); dist.push(l.dist); });
-        for(let i=this.lights.length;i<maxL;i++){p.push(0,0,0);c.push(0,0,0);w.push(0);cut.push(1);dist.push(0);}
-
-gl.useProgram(this.prog.room);
-
-        // --- CÁLCULO FACTOR DÍA/NOCHE ---
-        const timeVal = APP.ui.ready ? parseFloat(APP.ui.el.timeSlider.value) : 12.0;
-        // Fade in: 5h a 8h. Fade out: 19h a 21h.
-        const dawn = (timeVal - 5.0) / 3.0; 
-        const dusk = (21.0 - timeVal) / 2.0;
-        const dayFactor = Math.max(0.0, Math.min(1.0, Math.min(dawn, dusk)));
-        
-        // Enviar al shader
-        gl.uniform1f(gl.getUniformLocation(this.prog.room, "uDay"), dayFactor);
-
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.room,"uProj"),false,new Float32Array(proj));
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.room,"uView"),false,new Float32Array(vm));
-        gl.uniform3fv(gl.getUniformLocation(this.prog.room,"uFogColor"),this.env.fog);
-        gl.uniform1f(gl.getUniformLocation(this.prog.room,"uFogDen"),0.02);
-        gl.uniform1f(gl.getUniformLocation(this.prog.room,"uAmb"),APP.ui.ready?parseFloat(APP.ui.el.amb.value):0.1);
-        gl.uniform1f(gl.getUniformLocation(this.prog.room,"uExp"),APP.ui.ready?parseFloat(APP.ui.el.exp.value):1.6);
-        gl.uniform1f(gl.getUniformLocation(this.prog.room,"uGam"),2.2);
-        gl.uniform1i(gl.getUniformLocation(this.prog.room,"uCnt"),this.lights.length);
-        gl.uniform3fv(gl.getUniformLocation(this.prog.room,"uLP"),new Float32Array(p));
-        gl.uniform3fv(gl.getUniformLocation(this.prog.room,"uLC"),new Float32Array(c));
-        gl.uniform1fv(gl.getUniformLocation(this.prog.room,"uLW"),new Float32Array(w));
-        gl.uniform1fv(gl.getUniformLocation(this.prog.room,"uLCut"),new Float32Array(cut));
-        gl.uniform1fv(gl.getUniformLocation(this.prog.room,"uLDist"),new Float32Array(dist));
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.buffers.roomPos); gl.vertexAttribPointer(this.locs.room.pos,3,gl.FLOAT,false,0,0); gl.enableVertexAttribArray(this.locs.room.pos);
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.buffers.roomNor); gl.vertexAttribPointer(this.locs.room.nor,3,gl.FLOAT,false,0,0); gl.enableVertexAttribArray(this.locs.room.nor);
-        gl.drawArrays(gl.TRIANGLES,0,this.roomCounts.tri);
-        gl.useProgram(this.prog.line);
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.line,"uProj"),false,new Float32Array(proj));
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.line,"uView"),false,new Float32Array(vm));
-        gl.uniform4fv(gl.getUniformLocation(this.prog.line,"uCol"),this.env.grid);
-        gl.uniform3fv(gl.getUniformLocation(this.prog.line,"uFogColor"),this.env.fog);
-        gl.uniform1f(gl.getUniformLocation(this.prog.line,"uFogDen"),0.02);
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.buffers.grid); gl.vertexAttribPointer(this.locs.line.pos,3,gl.FLOAT,false,0,0); gl.enableVertexAttribArray(this.locs.line.pos);
-        gl.drawArrays(gl.LINES,0,this.roomCounts.grid);
-
-        gl.useProgram(this.prog.point);
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.point,"uProj"),false,new Float32Array(proj));
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.prog.point,"uView"),false,new Float32Array(vm));
-        const pt=new Float32Array(maxL*3), sel=new Float32Array(maxL);
-        this.lights.forEach((l,i)=>{pt[i*3]=l.x;pt[i*3+1]=l.y;pt[i*3+2]=l.z;sel[i]=(i===this.selected)?1:0;});
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.buffers.ptPos); gl.bufferData(gl.ARRAY_BUFFER,pt,gl.DYNAMIC_DRAW); gl.vertexAttribPointer(this.locs.point.pos,3,gl.FLOAT,false,0,0); gl.enableVertexAttribArray(this.locs.point.pos);
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.buffers.ptSel); gl.bufferData(gl.ARRAY_BUFFER,sel,gl.DYNAMIC_DRAW); gl.vertexAttribPointer(this.locs.point.sel,1,gl.FLOAT,false,0,0); gl.enableVertexAttribArray(this.locs.point.sel);
-        gl.drawArrays(gl.POINTS,0,this.lights.length);
-
-        requestAnimationFrame(()=>this.loop());
       }
     },
 
-    ui: {
-      el: {}, ready: false,
-      init() {
-        const ids = ['sel','add','del','clone','clr','wat','watNum','x','xNum','y','yNum','z','zNum',
-                     'angle','angleNum','dist','distNum','exp','amb','name','posRead','watRead',
-                     'cntL','maxL','btnThemeToggle','btnProjects','btnSave','projName','btnNewProj',
-                     'renameInput','btnRenameAction','btnEditRoomDims','roomW','roomH','roomL','btnApplyRoom',
-                     'timeSlider','timeDisplay','chkRoof','roomSel','btnAddRoom','btnDelRoom','btnCloneRoom',
-                     'roomPosX','roomPosXNum','roomPosZ','roomPosZNum','chkWalk'];
-        ids.forEach(id => { const e = document.getElementById(id); if(!e) throw new Error("UI fail: "+id); this.el[id] = e; });
-        document.getElementById('maxL').innerText = "32";
+    updateSelectionVisuals() {
+      this.meshes.lights.forEach((l, i) => {
+        // FIX: Toggle visibility of Object, not Material
+        l.helper.visible = (i === this.selected);
+        l.mesh.material.emissiveIntensity = (i === this.selected) ? 4.0 : 1.0; 
+      });
+    },
 
-        this.bindInput(this.el.wat, this.el.watNum, 'watts');
-        this.bindInput(this.el.x, this.el.xNum, 'x'); this.bindInput(this.el.y, this.el.yNum, 'y'); this.bindInput(this.el.z, this.el.zNum, 'z');
-        this.bindInput(this.el.angle, this.el.angleNum, 'angle'); this.bindInput(this.el.dist, this.el.distNum, 'dist');
-        this.el.clr.addEventListener('input', () => this.updateLightProp('color', this.el.clr.value));
-        this.el.sel.addEventListener('change', () => { APP.gl.selected = parseInt(this.el.sel.value); this.loadLightToInputs(); });
-        this.el.add.addEventListener('click', () => { if(APP.gl.lights.length>=32) return toast("Max luces"); APP.gl.lights.push({ name: "Luz "+(APP.gl.lights.length+1), x:0, y:8, z:0, watts:30, angle:60, dist:60, color:"#ffffff" }); APP.gl.selected=APP.gl.lights.length-1; this.refreshLightSelect(); APP.state.save(); });
-        this.el.clone.addEventListener('click', () => { if(APP.gl.selected<0) return; const src=APP.gl.lights[APP.gl.selected]; APP.gl.lights.push({ ...src, name: src.name+" (C)", x:src.x+0.5, z:src.z+0.5 }); APP.gl.selected=APP.gl.lights.length-1; this.refreshLightSelect(); APP.state.save(); });
-        this.el.del.addEventListener('click', () => { if(APP.gl.selected<0) return; APP.gl.lights.splice(APP.gl.selected,1); APP.gl.selected=Math.min(APP.gl.selected,APP.gl.lights.length-1); this.refreshLightSelect(); APP.state.save(); });
+    loop() {
+      requestAnimationFrame(() => this.loop());
 
-        this.el.roomSel.addEventListener('change', () => { APP.state.activeRoomIndex = parseInt(this.el.roomSel.value); this.syncRoomUI(); });
-        this.el.btnAddRoom.addEventListener('click', () => APP.state.addRoom());
-        this.el.btnCloneRoom.addEventListener('click', () => APP.state.cloneRoom());
-        this.el.btnDelRoom.addEventListener('click', () => APP.state.delRoom());
+      const cam = this.camera;
+      cam.rotation.y = this.camData.yaw;
+      cam.rotation.x = this.camData.pitch;
+
+      const s = 0.2; 
+      const dir = new THREE.Vector3();
+      const right = new THREE.Vector3();
+      cam.getWorldDirection(dir); dir.y = 0; dir.normalize(); 
+      right.crossVectors(dir, new THREE.Vector3(0,1,0)).normalize();
+
+      if(this.walk) {
+        if(this.keys.w) cam.position.addScaledVector(dir, s);
+        if(this.keys.s) cam.position.addScaledVector(dir, -s);
+        if(this.keys.d) cam.position.addScaledVector(right, s);
+        if(this.keys.a) cam.position.addScaledVector(right, -s);
         
-        // Logic change for Room Pos Inputs: allow free decimals (Objective 2)
-        const updateRoomPos = (fromInput) => { 
-            const r = APP.state.current.rooms[APP.state.activeRoomIndex]; 
-            // If fromInput is true, use number value, else use slider value
-            const valX = parseFloat(fromInput ? this.el.roomPosXNum.value : this.el.roomPosX.value);
-            const valZ = parseFloat(fromInput ? this.el.roomPosZNum.value : this.el.roomPosZ.value);
-            r.x = valX; r.z = valZ; 
-            
-            // Sync UI: if dragging slider, update num. If typing num, update slider (visually) but keep precision
-            if(!fromInput) { this.el.roomPosXNum.value = valX; this.el.roomPosZNum.value = valZ; }
-            else { this.el.roomPosX.value = valX; this.el.roomPosZ.value = valZ; }
+        const eyeH = 1.7;
+        if(this.keys[' ']) { if(cam.position.y <= eyeH + 0.1) this.velY = 0.2; }
+        this.velY -= 0.015;
+        cam.position.y += this.velY;
+        if(cam.position.y < eyeH) { cam.position.y = eyeH; this.velY = 0; }
+      } else {
+        if(this.keys.w) cam.translateZ(-s);
+        if(this.keys.s) cam.translateZ(s);
+        if(this.keys.d) cam.translateX(s);
+        if(this.keys.a) cam.translateX(-s);
+        if(this.keys.e) cam.position.y += s;
+        if(this.keys.q) cam.position.y -= s;
+      }
 
-            APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); 
-        };
-        this.el.roomPosX.addEventListener('input', () => updateRoomPos(false)); 
-        this.el.roomPosXNum.addEventListener('input', () => updateRoomPos(true));
-        this.el.roomPosZ.addEventListener('input', () => updateRoomPos(false)); 
-        this.el.roomPosZNum.addEventListener('input', () => updateRoomPos(true));
-        
-        this.el.chkRoof.addEventListener('change', () => { APP.state.current.rooms[APP.state.activeRoomIndex].roof = this.el.chkRoof.checked; APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); });
+      if(cam.position.y < 1.7) cam.position.y = 1.7;
 
-        this.el.btnThemeToggle.addEventListener('click', () => { const t = parseFloat(this.el.timeSlider.value); this.updateEnvironment(t > 6 && t < 18 ? 22 : 12); APP.state.save(); });
-        this.el.btnProjects.addEventListener('click', () => this.openModal('modalProjects'));
-        this.el.btnEditRoomDims.addEventListener('click', () => { const r = APP.state.current.rooms[APP.state.activeRoomIndex]; this.el.roomW.value = r.w; this.el.roomH.value = r.h; this.el.roomL.value = r.l; this.openModal('modalRoom'); });
-        this.el.btnSave.addEventListener('click', () => APP.state.save());
-        this.el.btnNewProj.addEventListener('click', () => APP.state.create());
-        this.el.btnRenameAction.addEventListener('click', () => APP.state.rename(APP.state.current.id, this.el.renameInput.value));
-        this.el.btnApplyRoom.addEventListener('click', () => { const w=parseFloat(this.el.roomW.value), h=parseFloat(this.el.roomH.value), l=parseFloat(this.el.roomL.value); if(!w || !h || !l) return toast("Inválido"); const r = APP.state.current.rooms[APP.state.activeRoomIndex]; r.w=w; r.h=h; r.l=l; APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); this.closeModals(); this.syncRoomUI(); toast("Dimensiones actualizadas"); });
-        this.el.timeSlider.addEventListener('input', () => this.updateEnvironment(parseFloat(this.el.timeSlider.value)));
+      let isInside = false;
+      const cP = cam.position;
+      const rooms = APP.state.current ? (APP.state.current.rooms || []) : [];
+      for(let r of rooms) {
+        const minX = r.x - r.w/2; const maxX = r.x + r.w/2;
+        const minZ = r.z - r.l/2; const maxZ = r.z + r.l/2;
+        if(cP.x > minX && cP.x < maxX && cP.z > minZ && cP.z < maxZ && cP.y < r.h) {
+          if(r.roof) { isInside = true; break; }
+        }
+      }
 
-        // --- WALK TOGGLE ---
-        this.el.chkWalk.addEventListener('change', () => { 
-            APP.gl.walk = this.el.chkWalk.checked; 
-            if(APP.gl.walk) toast("Click en pantalla para controlar");
-            else if(document.pointerLockElement) document.exitPointerLock();
-        });
-
-        document.getElementById('resetCam').addEventListener('click', () => { APP.gl.cam = { pos:[0,5,35], yaw:0, pitch:-0.1, fov:60 }; });
-        document.getElementById('resetAll').addEventListener('click', () => { if(confirm("¿Reset?")) APP.gl.loadLights(APP.state.template().lights); APP.state.save(); });
-        document.querySelectorAll('.modalClose, [data-close]').forEach(el => el.addEventListener('click', () => this.closeModals()));
-        this.ready = true;
-      },
+      const time = APP.ui.ready ? parseFloat(APP.ui.el.timeSlider.value) : 12;
+      const tNorm = Math.sin((time - 6) * Math.PI / 13); 
       
-      syncAll() { this.updateLabels(); this.syncRoomUI(); this.updateEnvironment(APP.state.current.env.time); this.refreshLightSelect(); },
-      syncRoomUI() {
-        const rooms = APP.state.current.rooms; const idx = APP.state.activeRoomIndex; if(idx >= rooms.length) APP.state.activeRoomIndex = 0;
-        this.el.roomSel.innerHTML = "";
-        rooms.forEach((r, i) => { const opt = document.createElement("option"); opt.value = i; opt.text = `${i+1}: ${r.name || 'Estructura'}`; this.el.roomSel.appendChild(opt); });
-        this.el.roomSel.value = APP.state.activeRoomIndex;
-        const r = rooms[APP.state.activeRoomIndex];
-        // Fix sync for free decimals (Objective 2)
-        this.el.roomPosX.value = r.x; this.el.roomPosXNum.value = r.x; 
-        this.el.roomPosZ.value = r.z; this.el.roomPosZNum.value = r.z;
-        this.el.chkRoof.checked = r.roof;
-        document.getElementById('roomDimsInline').innerText = `${r.w}x${r.h}x${r.l}`;
-      },
+      let skyColor = new THREE.Color().setHSL(0.6, 0.75, Math.max(0.02, tNorm * 0.5));
+      let fogCol = skyColor.clone();
+      let ambInt = Math.max(0.05, tNorm * 0.6);
 
-      updateEnvironment(t) {
-        this.el.timeSlider.value = t; this.el.timeDisplay.innerText = formatTime(t);
-        // Colores de cielo más saturados y naturales
-        const k = [
-          { t:0,  bg:[2,4,12],    fog:[0.01,0.02,0.05], grid:0.2, star:1.0, cloud:0.0 }, 
-          { t:5,  bg:[15,20,40],  fog:[0.05,0.05,0.12], grid:0.25, star:0.7, cloud:0.2 }, 
-          { t:6.5, bg:[255,140,80], fog:[0.6,0.3,0.2],  grid:0.4, star:0.1, cloud:0.6 }, // Amanecer
-          { t:8,  bg:[135,206,235], fog:[0.5,0.7,0.85], grid:0.5, star:0.0, cloud:0.8 }, 
-          { t:12, bg:[100,180,255], fog:[0.6,0.8,0.95], grid:0.6, star:0.0, cloud:0.9 },
-          { t:17, bg:[100,160,240], fog:[0.6,0.7,0.85], grid:0.6, star:0.0, cloud:0.9 }, 
-          { t:19, bg:[220,90,60],   fog:[0.7,0.35,0.2], grid:0.45, star:0.3, cloud:0.5 }, // Atardecer
-          { t:20.5, bg:[30,25,50],  fog:[0.1,0.05,0.1], grid:0.3, star:0.9, cloud:0.1 }, 
-          { t:24, bg:[2,4,12],    fog:[0.01,0.02,0.05], grid:0.2, star:1.0, cloud:0.0 }
-        ];
-        let i = 0; while(k[i+1].t < t) i++;
-        const p1=k[i], p2=k[i+1]; const f = (t - p1.t) / (p2.t - p1.t);
-        const cBg = lerpColor(p1.bg, p2.bg, f).map(Math.round);
-        document.getElementById('bgSky').style.background = `rgb(${cBg[0]},${cBg[1]},${cBg[2]})`;
-        document.getElementById('stars').style.opacity = lerp(p1.star, p2.star, f);
-        document.getElementById('clouds').style.opacity = lerp(p1.cloud, p2.cloud, f);
-        if(t > 7 && t < 19) document.documentElement.classList.add('ui-light'); else document.documentElement.classList.remove('ui-light');
-        APP.gl.env.fog = lerpColor(p1.fog, p2.fog, f);
-        APP.gl.env.grid = [0.5, 0.5, 0.5, lerp(p1.grid, p2.grid, f)];
-      },
+      if(isInside) {
+        ambInt = 0.02; 
+        fogCol.setHex(0x000000); 
+      }
 
-      // --- IMPROVED INPUT BINDING FOR FREE DECIMALS (Objective 2) ---
-      // Decouples the number input from forced slider steps when typing
-      bindInput(range, num, prop) { 
-        // Evento Slider: Actualiza número y propiedad
-        range.addEventListener('input', () => { 
-            const val = parseFloat(range.value);
-            num.value = val; // Slider manda sobre el número visualmente
-            this.updateLightProp(prop, val); 
-        });
-        // Evento Número: Actualiza propiedad EXACTA y slider visual
-        num.addEventListener('input', () => {
-            const val = parseFloat(num.value);
-            // No forzamos num.value = range.value para no perder precisión decimal al escribir
-            if(!isNaN(val)) {
-                range.value = val; // El slider se mueve a la posición más cercana
-                this.updateLightProp(prop, val);
-            }
-        });
-      },
-      updateLightProp(prop, val) { if(APP.gl.selected<0)return; const l=APP.gl.lights[APP.gl.selected]; l[prop]=val; if(['x','y','z'].includes(prop)) APP.gl.clampLight(l); this.loadLightToInputs(); },
-      loadLightToInputs() { if(APP.gl.selected<0) { document.getElementById('editCard').style.opacity=0.5; this.el.name.innerText="Ninguno"; return; } document.getElementById('editCard').style.opacity=1; const l = APP.gl.lights[APP.gl.selected]; this.el.name.innerText=l.name; this.el.watRead.innerText=l.watts+" W"; this.el.posRead.innerText=`x=${l.x.toFixed(2)} y=${l.y.toFixed(2)} z=${l.z.toFixed(2)}`; 
-        // Fix: Don't overwrite active element values to prevent cursor jumping
-        if(document.activeElement !== this.el.watNum) this.el.watNum.value=l.watts; if(document.activeElement !== this.el.wat) this.el.wat.value=l.watts;
-        if(document.activeElement !== this.el.xNum) this.el.xNum.value=l.x; if(document.activeElement !== this.el.x) this.el.x.value=l.x;
-        if(document.activeElement !== this.el.yNum) this.el.yNum.value=l.y; if(document.activeElement !== this.el.y) this.el.y.value=l.y;
-        if(document.activeElement !== this.el.zNum) this.el.zNum.value=l.z; if(document.activeElement !== this.el.z) this.el.z.value=l.z;
-        if(document.activeElement !== this.el.angleNum) this.el.angleNum.value=l.angle; if(document.activeElement !== this.el.angle) this.el.angle.value=l.angle;
-        if(document.activeElement !== this.el.distNum) this.el.distNum.value=l.dist; if(document.activeElement !== this.el.dist) this.el.dist.value=l.dist;
-        this.el.clr.value=l.color; },
-      refreshLightSelect() { this.el.sel.innerHTML=""; APP.gl.lights.forEach((l,i)=>{ const o=document.createElement('option'); o.value=i; o.innerText=l.name; this.el.sel.appendChild(o); }); this.el.sel.value=APP.gl.selected; this.el.cntL.innerText=APP.gl.lights.length; this.loadLightToInputs(); },
-      updateLabels() { this.el.projName.innerText=APP.state.current.name; this.el.renameInput.value=APP.state.current.name; },
-      renderProjectList() { const list = document.getElementById('projList'); list.innerHTML=""; Object.values(APP.state.projects).sort((a,b)=>b.updated-a.updated).forEach(p=>{ const li=document.createElement('li'); li.className=`projItem ${p.id===APP.state.current.id?'active':''}`; li.innerHTML=`<div><strong>${p.name}</strong><span class="projMeta">${new Date(p.updated).toLocaleDateString()}</span></div><div class="projActions"><button class="iconBtn" onclick="event.stopPropagation(); APP.state.delete('${p.id}')">🗑️</button></div>`; li.onclick=()=>APP.state.load(p.id); list.appendChild(li); }); },
-      openModal(id) { document.getElementById(id).classList.add('open'); if(id==='modalProjects') this.renderProjectList(); },
-      closeModals() { document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); }
+      this.scene.background = isInside ? new THREE.Color(0x111111) : skyColor;
+      this.scene.fog.color.lerp(fogCol, 0.1); 
+      this.env.ambient.intensity = lerp(this.env.ambient.intensity, ambInt, 0.1);
+
+      const grassDay = new THREE.Color(0x228822);
+      const grassNight = new THREE.Color(0x051111);
+      this.materials.floor.color.lerpColors(grassNight, grassDay, Math.max(0, tNorm));
+
+      if(APP.ui.ready) {
+        this.renderer.toneMappingExposure = parseFloat(APP.ui.el.exp.value);
+        this.env.ambient.intensity *= parseFloat(APP.ui.el.amb.value) * 10;
+      }
+
+      if(this.selected > -1 && this.meshes.lights[this.selected]) {
+        const selMesh = this.meshes.lights[this.selected];
+        const data = selMesh.data;
+        selMesh.light.position.set(data.x, data.y, data.z);
+        selMesh.mesh.position.set(data.x, data.y, data.z);
+        selMesh.helper.position.set(data.x, data.y, data.z);
+        selMesh.target.position.set(data.x, 0, data.z);
+        
+        selMesh.light.color.set(data.color);
+        selMesh.light.intensity = data.watts * 50;
+        selMesh.light.distance = data.dist;
+        selMesh.light.angle = (data.angle * Math.PI / 180) / 2;
+        selMesh.mesh.material.emissive.set(data.color);
+      }
+
+      this.renderer.render(this.scene, this.camera);
     }
-  };
+  },
 
-  window.onload = () => {
-    try {
-      console.log("Simulador 3D v2.5 (Natural + Walk + Pro Graphics)");
-      generateStars();
-      APP.gl.init();
-      APP.state.initData();
-      APP.ui.init();
-      APP.state.load(APP.state.current.id);
-    } catch(err) { fatal("Error de inicialización", err); }
-  };
-})();
+  ui: {
+    el: {}, ready: false,
+    init() {
+      const ids = ['sel','add','del','clone','clr','wat','watNum','x','xNum','y','yNum','z','zNum',
+                   'angle','angleNum','dist','distNum','exp','amb','name','posRead','watRead',
+                   'cntL','maxL','btnThemeToggle','btnProjects','btnSave','projName','btnNewProj',
+                   'renameInput','btnRenameAction','btnEditRoomDims','roomW','roomH','roomL','btnApplyRoom',
+                   'timeSlider','timeDisplay','chkRoof','roomSel','btnAddRoom','btnDelRoom','btnCloneRoom',
+                   'roomPosX','roomPosXNum','roomPosZ','roomPosZNum','chkWalk', 'lType', 'roomWallType'];
+      ids.forEach(id => { const e = document.getElementById(id); if(!e) throw new Error("UI fail: "+id); this.el[id] = e; });
+      document.getElementById('maxL').innerText = "32";
+
+      this.bindInput(this.el.wat, this.el.watNum, 'watts');
+      this.bindInput(this.el.x, this.el.xNum, 'x'); this.bindInput(this.el.y, this.el.yNum, 'y'); this.bindInput(this.el.z, this.el.zNum, 'z');
+      this.bindInput(this.el.angle, this.el.angleNum, 'angle'); this.bindInput(this.el.dist, this.el.distNum, 'dist');
+      this.el.clr.addEventListener('input', () => this.updateLightProp('color', this.el.clr.value));
+      this.el.lType.addEventListener('change', () => {
+         const val = parseInt(this.el.lType.value);
+         this.updateLightProp('type', val);
+         APP.gl.loadLights(APP.state.current.lights);
+      });
+      
+      this.el.sel.addEventListener('change', () => { 
+        APP.gl.selected = parseInt(this.el.sel.value); 
+        APP.gl.updateSelectionVisuals();
+        this.loadLightToInputs(); 
+      });
+      this.el.add.addEventListener('click', () => { if(APP.gl.lights.length>=32) return toast("Max luces"); APP.state.current.lights.push({ name: "Luz "+(APP.gl.lights.length+1), x:0, y:8, z:0, watts:30, angle:60, dist:60, color:"#ffffff", type:0 }); APP.gl.loadLights(APP.state.current.lights); APP.gl.selected=APP.gl.lights.length-1; this.refreshLightSelect(); APP.state.save(); });
+      this.el.clone.addEventListener('click', () => { if(APP.gl.selected<0) return; const src = APP.state.current.lights[APP.gl.selected];
+ APP.state.current.lights.push({ ...src, name: src.name+" (C)", x:src.x+0.5, z:src.z+0.5 }); APP.gl.loadLights(APP.state.current.lights); APP.gl.selected = APP.state.current.lights.length - 1;
+ this.refreshLightSelect(); APP.state.save(); });
+      this.el.del.addEventListener('click', () => { 
+        if(APP.gl.selected<0) return; 
+        APP.state.current.lights.splice(APP.gl.selected,1); 
+        APP.gl.loadLights(APP.state.current.lights); 
+        // FIX: Si borro todo, selected debe ser -1
+        APP.gl.selected = APP.state.current.lights.length > 0 ? Math.min(APP.gl.selected,APP.gl.lights.length-1) : -1; 
+        this.refreshLightSelect(); 
+        APP.gl.updateSelectionVisuals(); // Ensure visuals update
+        APP.state.save(); 
+      });
+
+      this.el.roomSel.addEventListener('change', () => { APP.state.activeRoomIndex = parseInt(this.el.roomSel.value); this.syncRoomUI(); });
+      this.el.btnAddRoom.addEventListener('click', () => APP.state.addRoom());
+      this.el.btnCloneRoom.addEventListener('click', () => APP.state.cloneRoom());
+      this.el.btnDelRoom.addEventListener('click', () => APP.state.delRoom());
+      
+      const updateRoomPos = (fromInput) => { 
+          const r = APP.state.current.rooms[APP.state.activeRoomIndex]; 
+          const valX = parseFloat(fromInput ? this.el.roomPosXNum.value : this.el.roomPosX.value);
+          const valZ = parseFloat(fromInput ? this.el.roomPosZNum.value : this.el.roomPosZ.value);
+          r.x = valX; r.z = valZ; 
+          if(!fromInput) { this.el.roomPosXNum.value = valX; this.el.roomPosZNum.value = valZ; }
+          else { this.el.roomPosX.value = valX; this.el.roomPosZ.value = valZ; }
+          APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); 
+      };
+      this.el.roomPosX.addEventListener('input', () => updateRoomPos(false)); 
+      this.el.roomPosXNum.addEventListener('input', () => updateRoomPos(true));
+      this.el.roomPosZ.addEventListener('input', () => updateRoomPos(false)); 
+      this.el.roomPosZNum.addEventListener('input', () => updateRoomPos(true));
+      
+      this.el.chkRoof.addEventListener('change', () => { APP.state.current.rooms[APP.state.activeRoomIndex].roof = this.el.chkRoof.checked; APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); });
+      
+      // NUEVO: Cambio de tipo de pared
+      this.el.roomWallType.addEventListener('change', () => {
+         APP.state.current.rooms[APP.state.activeRoomIndex].wallType = this.el.roomWallType.value;
+         APP.gl.loadRoom(APP.state.current.rooms);
+         APP.state.save();
+      });
+
+      this.el.btnThemeToggle.addEventListener('click', () => { const t = parseFloat(this.el.timeSlider.value); this.el.timeSlider.value = (t > 6 && t < 18 ? 22 : 12); APP.state.save(); });
+      this.el.btnProjects.addEventListener('click', () => this.openModal('modalProjects'));
+      this.el.btnEditRoomDims.addEventListener('click', () => { const r = APP.state.current.rooms[APP.state.activeRoomIndex]; this.el.roomW.value = r.w; this.el.roomH.value = r.h; this.el.roomL.value = r.l; this.openModal('modalRoom'); });
+      this.el.btnSave.addEventListener('click', () => APP.state.save());
+      this.el.btnNewProj.addEventListener('click', () => APP.state.create());
+      this.el.btnRenameAction.addEventListener('click', () => APP.state.rename(APP.state.current.id, this.el.renameInput.value));
+      this.el.btnApplyRoom.addEventListener('click', () => { const w=parseFloat(this.el.roomW.value), h=parseFloat(this.el.roomH.value), l=parseFloat(this.el.roomL.value); if(!w || !h || !l) return toast("Inválido"); const r = APP.state.current.rooms[APP.state.activeRoomIndex]; r.w=w; r.h=h; r.l=l; APP.gl.loadRoom(APP.state.current.rooms); APP.state.save(); this.closeModals(); this.syncRoomUI(); toast("Dimensiones actualizadas"); });
+      
+      this.el.timeSlider.addEventListener('input', () => { this.el.timeDisplay.innerText = formatTime(parseFloat(this.el.timeSlider.value)); });
+
+      this.el.chkWalk.addEventListener('change', () => { 
+          APP.gl.walk = this.el.chkWalk.checked; 
+          if(APP.gl.walk) toast("Click en pantalla para controlar");
+          else if(document.pointerLockElement) document.exitPointerLock();
+      });
+
+      document.getElementById('resetCam').addEventListener('click', () => { 
+        APP.gl.camera.position.set(0,5,35); 
+        APP.gl.camData = { yaw: 0, pitch: -0.1 }; 
+        if(APP.gl.camera.position.y < 1.7) APP.gl.camera.position.y = 1.7;
+      });
+      document.getElementById('resetAll').addEventListener('click', () => { if(confirm("¿Reset?")) { APP.state.current.lights = APP.state.template().lights; APP.gl.loadLights(APP.state.current.lights); } APP.state.save(); });
+      document.querySelectorAll('.modalClose, [data-close]').forEach(el => el.addEventListener('click', () => this.closeModals()));
+      this.ready = true;
+    },
+    
+    syncAll() { this.updateLabels(); this.syncRoomUI(); this.el.timeSlider.value = APP.state.current.env.time; this.refreshLightSelect(); },
+    syncRoomUI() {
+      const rooms = APP.state.current.rooms; const idx = APP.state.activeRoomIndex; if(idx >= rooms.length) APP.state.activeRoomIndex = 0;
+      this.el.roomSel.innerHTML = "";
+      rooms.forEach((r, i) => { const opt = document.createElement("option"); opt.value = i; opt.text = `${i+1}: ${r.name || 'Estructura'}`; this.el.roomSel.appendChild(opt); });
+      this.el.roomSel.value = APP.state.activeRoomIndex;
+      const r = rooms[APP.state.activeRoomIndex];
+      this.el.roomPosX.value = r.x; this.el.roomPosXNum.value = r.x; 
+      this.el.roomPosZ.value = r.z; this.el.roomPosZNum.value = r.z;
+      this.el.chkRoof.checked = r.roof;
+      this.el.roomWallType.value = r.wallType || 'plaster'; // Sync UI
+      document.getElementById('roomDimsInline').innerText = `${r.w}x${r.h}x${r.l}`;
+    },
+
+    bindInput(range, num, prop) { 
+      range.addEventListener('input', () => { const val = parseFloat(range.value); num.value = val; this.updateLightProp(prop, val); });
+      num.addEventListener('input', () => { const val = parseFloat(num.value); if(!isNaN(val)) { range.value = val; this.updateLightProp(prop, val); } });
+    },
+    updateLightProp(prop, val) { if(APP.gl.selected<0)return; const l=APP.state.current.lights[APP.gl.selected]; l[prop]=val; if(['x','y','z'].includes(prop)) APP.gl.clampLight(l); this.loadLightToInputs(); },
+    loadLightToInputs() { if(APP.gl.selected<0) { document.getElementById('editCard').style.opacity=0.5; this.el.name.innerText="Ninguno"; return; } document.getElementById('editCard').style.opacity=1; const l = APP.state.current.lights[APP.gl.selected]; this.el.name.innerText=l.name; this.el.watRead.innerText=l.watts+" W"; this.el.posRead.innerText=`x=${l.x.toFixed(2)} y=${l.y.toFixed(2)} z=${l.z.toFixed(2)}`; 
+      if(document.activeElement !== this.el.watNum) this.el.watNum.value=l.watts; if(document.activeElement !== this.el.wat) this.el.wat.value=l.watts;
+      if(document.activeElement !== this.el.xNum) this.el.xNum.value=l.x; if(document.activeElement !== this.el.x) this.el.x.value=l.x;
+      if(document.activeElement !== this.el.yNum) this.el.yNum.value=l.y; if(document.activeElement !== this.el.y) this.el.y.value=l.y;
+      if(document.activeElement !== this.el.zNum) this.el.zNum.value=l.z; if(document.activeElement !== this.el.z) this.el.z.value=l.z;
+      if(document.activeElement !== this.el.angleNum) this.el.angleNum.value=l.angle; if(document.activeElement !== this.el.angle) this.el.angle.value=l.angle;
+      if(document.activeElement !== this.el.distNum) this.el.distNum.value=l.dist; if(document.activeElement !== this.el.dist) this.el.dist.value=l.dist;
+      this.el.clr.value=l.color;
+      this.el.lType.value = l.type || 0; 
+    },
+    refreshLightSelect() { this.el.sel.innerHTML=""; APP.state.current.lights.forEach((l,i)=>{ const o=document.createElement('option'); o.value=i; o.innerText=l.name; this.el.sel.appendChild(o); }); this.el.sel.value=APP.gl.selected; this.el.cntL.innerText=APP.state.current.lights.length; this.loadLightToInputs(); },
+    updateLabels() { this.el.projName.innerText=APP.state.current.name; this.el.renameInput.value=APP.state.current.name; },
+    renderProjectList() { const list = document.getElementById('projList'); list.innerHTML=""; Object.values(APP.state.projects).sort((a,b)=>b.updated-a.updated).forEach(p=>{ const li=document.createElement('li'); li.className=`projItem ${p.id===APP.state.current.id?'active':''}`; li.innerHTML=`<div><strong>${p.name}</strong><span class="projMeta">${new Date(p.updated).toLocaleDateString()}</span></div><div class="projActions"><button class="iconBtn" onclick="event.stopPropagation(); APP.state.delete('${p.id}')">🗑️</button></div>`; li.onclick=()=>APP.state.load(p.id); list.appendChild(li); }); },
+    openModal(id) { document.getElementById(id).classList.add('open'); if(id==='modalProjects') this.renderProjectList(); },
+    closeModals() { document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); }
+  }
+};
+
+window.onload = () => {
+  try {
+    console.log("Simulador 3D v5.2 (Fixes & Textures)");
+    APP.state.initData();
+    APP.gl.init();
+    APP.ui.init();
+    APP.state.load(APP.state.current.id);
+  } catch(err) { fatal("Error de inicialización", err); }
+};
 </script>
 </body>
 </html>
